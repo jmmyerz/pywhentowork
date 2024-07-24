@@ -139,13 +139,9 @@ class WhenToWork:
         if isinstance(end_date, str):
             end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
 
-        # Raise an error if the start date is after the end date
+        # If the start date is after the end date, ignore the end date
         if start_date > end_date:
-            # If the end date is today (default), set it to the start date
-            if end_date == datetime.datetime.now().date():
-                end_date = start_date
-            else:
-                raise ValueError("Start date cannot be after end date.")
+            end_date = start_date
 
         # W2W accepts a max of 31 days, so constrain end_date to 31 days after start_date if necessary
         if (end_date - start_date).days > 31:
