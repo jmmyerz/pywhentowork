@@ -112,6 +112,14 @@ class WhenToWork:
 
         return self.positions
 
+    def get_category_list(self) -> list:
+        """
+        Get a list of all categories in the account.
+        """
+        response = self._post_to_endpoint("CategoryList", {})
+
+        return [Category.from_json(category) for category in response["CategoryList"]]
+
     def get_assigned_shift_list(
         self,
         start_date: datetime.date | str = datetime.datetime.now().date(),

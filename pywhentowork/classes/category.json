@@ -1,0 +1,10 @@
+[
+  "company_id",
+  "category_id",
+  "category_name",
+  "category_short",
+  "category_custom1",
+  "category_custom2",
+  "category_custom3",
+  "last_changed_ts"
+]
