@@ -1,0 +1,22 @@
+[
+  "sign_in_count",
+  "address",
+  "address_2",
+  "city",
+  "state",
+  "zip",
+  "comments",
+  "max_hrs_day",
+  "max_shifts_day",
+  "max_hrs_week",
+  "max_days_week",
+  "hire_date",
+  "status",
+  "priority_group",
+  "custom_1",
+  "custom_2",
+  "biweekly_target_hrs",
+  "pay_rate",
+  "alert_date",
+  "next_alert"
+]

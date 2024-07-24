@@ -1,0 +1,9 @@
+[
+  "company_id",
+  "position_id",
+  "position_name",
+  "position_custom1",
+  "position_custom2",
+  "position_custom3",
+  "last_changed_ts"
+]
