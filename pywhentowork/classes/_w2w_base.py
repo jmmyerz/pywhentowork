@@ -1,4 +1,4 @@
-import json
+import json, os
 
 
 class W2WBaseClass:
@@ -46,7 +46,11 @@ def load_fields(class_name) -> list:
     Load the fields of a class from a JSON file.
     Each JSON file should contain a list of strings representing the fields of the class.
     """
-    with open(f"pywhentowork/classes/{class_name}.json", "r") as f:
+
+    # Resolve the location of this file to find the JSON file
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+
+    with open(f"{current_dir}/{class_name}.json", "r") as f:
         fields = json.load(f)
 
     return fields
