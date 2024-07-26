@@ -14,6 +14,9 @@ Homepage = "https://github.com/jmmyerz/pywhentowork"
 Repository = "https://github.com/jmmyerz/pywhentowork.git"
 "Bug Tracker" = "https://github.com/jmmyerz/pywhentowork/issues"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.packages.find]
 include = ["pywhentowork*"]
 exclude = ["virtual_env*"]
@@ -22,4 +25,4 @@ exclude = ["virtual_env*"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.package-data]
-'' = ['*.json']
+"" = ['*.json']
