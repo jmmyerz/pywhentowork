@@ -1,0 +1,22 @@
+[project]
+name = "pywhentowork"
+version = "0.1.1"
+dynamic = ["dependencies"]
+requires-python = ">=3.11"
+authors = [
+  {name = "Jordan Myers", email = "jm@jordanmyers.me"},
+]
+
+description = "Python libraries for WhenToWork API"
+
+[project.urls]
+Homepage = "https://github.com/jmmyerz/pywhentowork"
+Repository = "https://github.com/jmmyerz/pywhentowork.git"
+"Bug Tracker" = "https://github.com/jmmyerz/pywhentowork/issues"
+
+[tool.setuptools.packages.find]
+include = ["pywhentowork*"]
+exclude = ["virtual_env*"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}

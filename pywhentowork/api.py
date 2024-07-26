@@ -2,7 +2,7 @@
 Handles the API calls to the WhenToWork API
 """
 
-import requests, datetime
+import requests, datetime, pprint
 
 from pywhentowork.classes import *
 
@@ -21,18 +21,12 @@ class WhenToWork:
     def __init__(
         self,
         key: str,
-        base_url: str = "https://www6.whentowork.com/cgi-bin/w2wF.dll/api/",
+        base_url: str = "https://www3.whentowork.com/cgi-bin/w2wCC.dll/api/",
     ) -> None:
         self._key = key
         self._base_url = base_url
 
         self.positions = self.get_position_list()
-
-        # Verify the base_url makes sense (the www6 and w2wF.dll are correlated)
-        if not self._is_base_url_valid():
-            raise ValueError(
-                "Invalid base_url: The subdomain and dll definitions do not match."
-            )
 
     @property
     def key(self) -> str:
@@ -54,28 +48,7 @@ class WhenToWork:
         if not base_url:
             raise ValueError("Base URL cannot be empty.")
 
-        if self._is_base_url_valid():
-            self._base_url = base_url
-
-    def _is_base_url_valid(self) -> bool:
-        import re
-
-        # Extract the number from wwwX and the letter from w2wX.dll
-        www_match = re.search(r"www(\d+)", self.base_url)
-        dll_match = re.search(r"w2w([A-Za-z])\.dll", self.base_url)
-
-        if www_match and dll_match:
-            www_number = int(www_match.group(1))
-            dll_letter = dll_match.group(1).upper()
-
-            # Convert the letter to its position in the alphabet
-            letter_position = ord(dll_letter) & 31
-
-            # Check if the extracted number matches the position of the letter
-            return www_number == letter_position
-
-        # If either pattern wasn't found, the URL is considered invalid
-        return False
+        self._base_url = base_url
 
     def _post_to_endpoint(self, endpoint: str, params: dict) -> dict:
         if endpoint not in VALID_ENDPOINTS:
@@ -173,3 +146,14 @@ class WhenToWork:
         )
 
         return [Shift.from_json(shift) for shift in response["AssignedShiftList"]]
+
+    def pprint_object_list(self, obj_list: list) -> None:
+        """
+        Pretty print a list of objects.
+        """
+        for obj in obj_list:
+            # Get the object as a dict
+            obj_dict = obj.__dict__
+
+            # Pretty print the object
+            pprint.pprint(obj_dict)
