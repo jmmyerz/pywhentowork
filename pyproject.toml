@@ -25,4 +25,4 @@ exclude = ["virtual_env*"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.package-data]
-'classes' = ['*.json']
+'pywhentowork' = ['*.json']
