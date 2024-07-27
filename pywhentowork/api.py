@@ -146,16 +146,15 @@ class WhenToWork:
         """
         Get a list of all assigned shifts for a date or range of dates. Optionally filtered by position.
 
-        Args:
-            start_date (datetime.date or str): Start date for the query.
-                - Defaults to the current date.
-                - If a string is provided, it should be in the format "YYYY-MM-DD".
-            end_date (datetime.date or str): End date for the query.
-                - Defaults to the current date.
-                - If a string is provided, it should be in the format "YYYY-MM-DD".
-            position (Position or str): Position for which to get the shifts.
-                - Defaults to an empty string (all positions).
-                - If a string is provided, it should be the position_id.
+        :param start_date: (datetime.date or str) Start date for the query.
+            - Defaults to the current date.
+            - If a string is provided, it should be in the format "YYYY-MM-DD".
+        :param end_date: (datetime.date or str) End date for the query.
+            - Defaults to the current date.
+            - If a string is provided, it should be in the format "YYYY-MM-DD".
+        :param position: (Position or str) Position for which to get the shifts.
+            - Defaults to an empty string (all positions).
+            - If a string is provided, it should be the position_id.
         """
 
         # Convert the dates to datetime.date objects if they are strings
@@ -195,20 +194,44 @@ class WhenToWork:
         return assigned_shifts
 
     def search_objects(
-        self, obj_list: list, search_field: str, search_value: str
+        self,
+        obj_list: list,
+        search_field: str | list[str],
+        search_value: str | list[str],
     ) -> list:
         """
         Search a list of objects for a specific value in a specific field.
+
+        :param obj_list: (list) List of objects to search.
+        :param search_field: (str or list) Field(s) to search for the value(s).
+        :param search_value: (str or list) Value(s) to search for in the field(s).
         """
 
-        # Create a new fuzzy regex pattern for the search value
-        pattern = regex.compile(
-            f".*{search_value}.*", regex.IGNORECASE | regex.BESTMATCH
+        _search_fields = (
+            search_field if isinstance(search_field, list) else [search_field]
+        )
+        _search_values = (
+            search_value if isinstance(search_value, list) else [search_value]
         )
 
-        # Filter the list of objects based on the search value
+        # Simple regex pattern for each value
+        _patterns = [
+            regex.compile(
+                f"{value}",
+                regex.IGNORECASE,
+            )
+            for value in _search_values
+        ]
+
+        # For each field, try each pattern
         search_results = [
-            obj for obj in obj_list if pattern.match(getattr(obj, search_field))
+            obj
+            for obj in obj_list
+            if any(
+                pattern.match(getattr(obj, field))
+                for pattern in _patterns
+                for field in _search_fields
+            )
         ]
 
         return search_results
