@@ -2,7 +2,7 @@
 
 Retrieves data from WhenToWork's Pro API and make it accessible using Python classes.
 
-Version: 0.1.3 20240726
+Version: 0.1.4 20240727
 
 ## Usage
 

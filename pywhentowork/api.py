@@ -2,7 +2,7 @@
 Handles the API calls to the WhenToWork API
 """
 
-import requests, datetime, pprint
+import requests, datetime, pprint, regex
 
 from pywhentowork.classes import *
 
@@ -64,34 +64,78 @@ class WhenToWork:
 
         return response.json()
 
-    def get_employee_list(self) -> list:
+    def _sort_objects(self, obj_list: list, sort_field: str, sort_order: str) -> list:
+        """
+        Sort a list of objects by a field.
+        """
+        try:
+            obj_list.sort(
+                key=lambda x: getattr(x, sort_field), reverse=sort_order == "desc"
+            )
+        except AttributeError:
+            # If the sort field is not found, raise an error
+            raise ValueError(f"Invalid sort field: {sort_field}")
+
+        return obj_list
+
+    def get_employee_list(
+        self, sort_field: str = "last_name", sort_order: str = "asc"
+    ) -> list:
         """
         Get a list of all employees in the account.
         """
-        response = self._post_to_endpoint("EmployeeList", {})
+        response: list = self._post_to_endpoint("EmployeeList", {})["EmployeeList"]
 
-        return [Employee.from_json(employee) for employee in response["EmployeeList"]]
+        # Generate a list of Employee objects from the response
+        employees: list[Employee] = [
+            Employee.from_json(employee) for employee in response
+        ]
 
-    def get_position_list(self) -> list:
+        # Sort the list of employees
+        self._sort_objects(employees, sort_field, sort_order)
+
+        return employees
+
+    def get_position_list(
+        self,
+        sort_field: str = "position_name",
+        sort_order: str = "asc",
+    ) -> list:
         """
         Get a list of all positions in the account.
         """
-        response = self._post_to_endpoint("PositionList", {})
+        response: list = self._post_to_endpoint("PositionList", {})["PositionList"]
+
+        # Generate a list of Position objects from the response
+        positions: list[Position] = [
+            Position.from_json(position) for position in response
+        ]
+
+        # Sort the list of positions
+        positions = self._sort_objects(positions, sort_field, sort_order)
 
         # Update self.positions with the new list of positions
-        self.positions = [
-            Position.from_json(position) for position in response["PositionList"]
-        ]
+        self.positions = positions
 
         return self.positions
 
-    def get_category_list(self) -> list:
+    def get_category_list(
+        self, sort_field: str = "category_name", sort_order: str = "asc"
+    ) -> list:
         """
         Get a list of all categories in the account.
         """
-        response = self._post_to_endpoint("CategoryList", {})
+        response = self._post_to_endpoint("CategoryList", {})["CategoryList"]
 
-        return [Category.from_json(category) for category in response["CategoryList"]]
+        # Generate a list of Category objects from the response
+        categories: list[Category] = [
+            Category.from_json(category) for category in response
+        ]
+
+        # Sort the list of categories
+        categories = self._sort_objects(categories, sort_field, sort_order)
+
+        return categories
 
     def get_assigned_shift_list(
         self,
@@ -100,7 +144,7 @@ class WhenToWork:
         position: Position | str = "",
     ) -> list:
         """
-        Get a list of all assigned shifts for an employee.
+        Get a list of all assigned shifts for a date or range of dates. Optionally filtered by position.
 
         Args:
             start_date (datetime.date or str): Start date for the query.
@@ -143,9 +187,31 @@ class WhenToWork:
                 "end_date": _end_date_string,
                 "position": position_id,
             },
+        )["AssignedShiftList"]
+
+        # Generate a list of Shift objects from the response
+        assigned_shifts: list[Shift] = [Shift.from_json(shift) for shift in response]
+
+        return assigned_shifts
+
+    def search_objects(
+        self, obj_list: list, search_field: str, search_value: str
+    ) -> list:
+        """
+        Search a list of objects for a specific value in a specific field.
+        """
+
+        # Create a new fuzzy regex pattern for the search value
+        pattern = regex.compile(
+            f".*{search_value}.*", regex.IGNORECASE | regex.BESTMATCH
         )
 
-        return [Shift.from_json(shift) for shift in response["AssignedShiftList"]]
+        # Filter the list of objects based on the search value
+        search_results = [
+            obj for obj in obj_list if pattern.match(getattr(obj, search_field))
+        ]
+
+        return search_results
 
     def pprint_object_list(self, obj_list: list) -> None:
         """
